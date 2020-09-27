@@ -17,7 +17,7 @@ All planets and stars rotate and orbit at their real-life speeds (time passed ca
 # Credits
 * Maxwell Hubbard - Programming and Voice Acting
 * Nasa - Planets and Space information and planet textures
-* [Ebal Studios] (https://assetstore.unity.com/publishers/24304) - Spaceship Cockpit Asset
-* [Mirza Beig] (https://assetstore.unity.com/publishers/7271) - Sun Fire Effects
+* [Ebal Studios](https://assetstore.unity.com/publishers/24304) - Spaceship Cockpit Asset
+* [Mirza Beig](https://assetstore.unity.com/publishers/7271) - Sun Fire Effects
 
 
