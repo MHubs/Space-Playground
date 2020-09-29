@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StoryStart : MonoBehaviour
@@ -16,7 +15,6 @@ public class StoryStart : MonoBehaviour
     public GameObject sky;
     public GameObject mainMenu;
     public Animator menuAnimator;
-    private float cameraRotateSpeed = 75.0f;
     public float rotateSpeed = 10.0f;
     public GameObject[] planetOrder;
     private GameObject currentPlanet;
@@ -51,6 +49,7 @@ public class StoryStart : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        //Shake the cockpit to simulate launching
         if (launching)
         {
             cockpit.transform.localPosition = new Vector3(cockpitPos.x + (Mathf.Sin(Time.time * speed) * amount), cockpitPos.y, cockpitPos.z);
@@ -60,12 +59,12 @@ public class StoryStart : MonoBehaviour
             cockpit.transform.localPosition = cockpitPos;
         }
 
-
+        //Only run if we want to move towards a planet
         if (currentPlanet != null)
         {
             if (movingTowards)
             {
-
+                //Slowly interpolate distance towards planet
                 Vector3 sub = currentPlanet.transform.position - prevPos.position;
                 SphereCollider col = currentPlanet.GetComponent<SphereCollider>();
 
@@ -84,11 +83,13 @@ public class StoryStart : MonoBehaviour
 
             } else
             {
+                //Rotate around planet once we get there
                 mainCamera.transform.LookAt(currentPlanet.transform, Vector3.up);
                 mainCamera.transform.Translate(Vector3.right * rotateSpeed * Mathf.Min(currentPlanet.transform.localScale.x, 5) * Time.deltaTime);
             }
             if (ending)
             {
+                //Rotate around the sun at the end
                 Vector3 sub = currentPlanet.transform.position - prevPos.position;
 
                 currTR += Time.deltaTime / 1.5f;
@@ -109,6 +110,7 @@ public class StoryStart : MonoBehaviour
         mainCamera.transform.LookAt(earth.transform, Vector3.up);
 
         mainMenu.SetActive(false);
+
         // Play prelaunch sequence
         countDownAudio.loop = false;
         float clipLength = countDownAudio.clip.length;
@@ -119,6 +121,7 @@ public class StoryStart : MonoBehaviour
 
     public void Launch()
     {
+        // Start Launch
         float clipLength = launchAudio.clip.length;
         cockpitPos = cockpit.transform.localPosition;
         launching = true;
@@ -138,12 +141,12 @@ public class StoryStart : MonoBehaviour
         movingTowards = true;
         prevPos = mainCamera.transform;
         currentPlanet = obj;
-        
-        
+        //Actual moving takes place in Update()
     }
 
     private IEnumerator afterCountdown(float clipLength)
     {
+        //Wait until done with audio
         yield return new WaitForSeconds(clipLength);
         Launch();
     }
@@ -155,7 +158,7 @@ public class StoryStart : MonoBehaviour
         launching = false;
         StoryConstants.Instance.isDoneL = true;
 
-
+        //Lock camera in story mode
         FreeFlyCamera ffc = mainCamera.GetComponent<FreeFlyCamera>();
         ffc._active = false;
 
@@ -183,6 +186,7 @@ public class StoryStart : MonoBehaviour
 
         if (index < planetOrder.Length)
         {
+            //Move to the next planet and reset moving intervals
             currT = 0;
             currTR = 0;
             float length = planetFactAudio[index].clip.length;
@@ -191,7 +195,7 @@ public class StoryStart : MonoBehaviour
             StartCoroutine(startNextPlanet(length, index + 1));
         } else
         {
-            //Do end
+            //Run ending sequence since we're out of planets
             movingTowards = false;
             ending = true;
             currentPlanet = planetOrder[0];
@@ -205,6 +209,7 @@ public class StoryStart : MonoBehaviour
     {
         yield return new WaitForSeconds(length - 0.75f);
 
+        //Fade screen to black
         fadingPanel.SetActive(true);
         currentPlanet = null;
 
@@ -217,6 +222,7 @@ public class StoryStart : MonoBehaviour
     {
         yield return new WaitForSeconds(10);
 
+        //Close UI panels if open
         panelManager.CloseCurrent();
 
     }
@@ -224,6 +230,8 @@ public class StoryStart : MonoBehaviour
     private IEnumerator endFade(float length)
     {
         yield return new WaitForSeconds(length);
+
+        //Reset for next time story is run, return to main menu
         mainCamera.transform.position = new Vector3(0, 600, -100);
         mainCamera.transform.rotation = Quaternion.Euler(0, 0, 0);
            
